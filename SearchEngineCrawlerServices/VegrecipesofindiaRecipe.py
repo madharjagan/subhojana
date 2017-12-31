@@ -1,8 +1,16 @@
 from Recipe import Recipe
-from bs4 import BeautifulSoup as soup  # HTML data structure
-from urllib.request import urlopen as uReq  # Web client
+from bs4 import BeautifulSoup as soup  
+from urllib.request import urlopen as uReq
+
+#For unit testing - Exposing it as REST service
+from flask import Flask
+from flask import request
+from flask_cors import CORS
+app = Flask(__name__)
+CORS(app)
 
 class VegrecipesofindiaRecipe(Recipe):
+	@app.route("/vegrecipesofindia/getRecipes")
 	def getRecipes(self, page_uri):
 		receipejson=[]
 		rid = 1
@@ -16,13 +24,15 @@ class VegrecipesofindiaRecipe(Recipe):
 		uClient.close()
 		return receipejson
 
+	@app.route("/vegrecipesofindia/getIngredents")
 	def getIngredents(self, page_url):
 		print(page_url)
 		uClient = uReq(page_url)
 		page_soup = soup(uClient.read(), "html.parser")
 		receipe_containers = page_soup.findAll("div", {"class": "wprm-recipe-ingredients-container"})
 		return str(receipe_containers[0])
-		
+	
+	@app.route("/vegrecipesofindia/getMethod")
 	def getMethod(self, page_url):
 		uClient = uReq(page_url)
 		page_soup = soup(uClient.read(), "html.parser")
